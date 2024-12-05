@@ -12,7 +12,12 @@ function Login() {
                     <span className='text-base'> Введите <b>логин</b> и <b>пароль</b> </span>
                 </div>
                 <div className='input flex flex-col items-start w-1/2'>
-                    <input type='text' className='login p-2 border border-gray-300 rounded w-full' placeholder='Логин' />
+                    <input 
+                    type='text' 
+                    className='login p-2 border border-gray-300 rounded w-full' 
+                    placeholder='Логин'
+                     
+                    />
                     <input type='password' className= 'passwrd p-2 border border-gray-300 rounded w-full' placeholder='Пароль' />
                 </div>
             </div>
