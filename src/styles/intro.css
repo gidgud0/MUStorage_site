@@ -1,0 +1,18 @@
+.intro {
+    padding: 2em;
+    border: 5px solid rgb(0, 9, 39);
+    border-radius: 20px;
+    background-color: rgb(23, 0, 77);
+}
+
+.container {
+    height: 20em;
+}
+
+.input {
+    height: 10em;
+}
+
+.passwrd {
+    margin-top: 1em;
+}
