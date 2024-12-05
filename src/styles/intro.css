@@ -1,8 +1,10 @@
 .intro {
     padding: 2em;
-    border: 5px solid rgb(0, 9, 39);
+    border: 5px solid #8A2BE2;
     border-radius: 20px;
     background-color: rgb(23, 0, 77);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    color: #F5F5F5;
 }
 
 .container {
