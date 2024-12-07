@@ -1,38 +1,45 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import axios from 'axios';
 
-interface User {
-  id: number;
-  username: string;
-  password: string;
+// Асинхронное действие для получения данных из API
+export const fetchUsers = createAsyncThunk('users/fetchUsers', async () => {
+  const response = await axios.get('https://jsonplaceholder.typicode.com/users');
+  return response.data; // Данные из API
+});
+
+// Начальное состояние
+interface UsersState {
+  users: Array<{ id: number; name: string; email: string }>;
+  loading: boolean;
+  error: string | null;
 }
 
-type UsersState = User[];
+const initialState: UsersState = {
+  users: [],
+  loading: false,
+  error: null,
+};
 
-const initialState: UsersState = [];
-
+// Создаем slice
 const usersSlice = createSlice({
   name: 'users',
   initialState,
-  reducers: {
-    addUser: (state, action: PayloadAction<Omit<User, 'id'>>) => {
-      const newUser: User = {
-        id: Date.now(),
-        ...action.payload,
-      };
-      state.push(newUser);
-    },
-    updateUserPassword: (
-      state,
-      action: PayloadAction<{ id: number; newPassword: string }>
-    ) => {
-      const { id, newPassword } = action.payload;
-      const user = state.find((user) => user.id === id);
-      if (user) {
-        user.password = newPassword;
-      }
-    },
+  reducers: {}, // Здесь можно добавить синхронные действия
+  extraReducers: (builder) => {
+    builder
+      .addCase(fetchUsers.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchUsers.fulfilled, (state, action) => {
+        state.loading = false;
+        state.users = action.payload;
+      })
+      .addCase(fetchUsers.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message || 'Error fetching users';
+      });
   },
 });
 
-export const { addUser, updateUserPassword } = usersSlice.actions;
 export default usersSlice.reducer;
