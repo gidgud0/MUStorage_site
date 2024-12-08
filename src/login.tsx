@@ -24,7 +24,7 @@ function Login() {
                         <a href='#'> Забыли пароль? </a>
                     </div>
                     <div className='reg'>
-                        <a href='#'> Зарегистрироваться </a>
+                        <a href=''> Зарегистрироваться </a>
                     </div>
                 </div>
             </div>
