@@ -1,0 +1,25 @@
+#root {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 2rem;
+    text-align: center;
+  }
+
+  .form {
+    align-items: flex-start;
+    
+  }
+
+  .container {
+    padding: 5em;
+    border: 5px solid #8A2BE2;
+    border-radius: 20px;
+    background-color: rgb(23, 0, 77);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    color: #F5F5F5;
+  }
+  
+  .reg {
+    margin-bottom: 2em;
+    font-size: 22px;
+  }

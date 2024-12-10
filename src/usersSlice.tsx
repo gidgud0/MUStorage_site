@@ -1,45 +1,35 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import axios from 'axios';
+// src/usersSlice.ts
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
-// Асинхронное действие для получения данных из API
-export const fetchUsers = createAsyncThunk('users/fetchUsers', async () => {
-  const response = await axios.get('https://jsonplaceholder.typicode.com/users');
-  return response.data; // Данные из API
-});
-
-// Начальное состояние
-interface UsersState {
-  users: Array<{ id: number; name: string; email: string }>;
-  loading: boolean;
-  error: string | null;
+interface UserState {
+  username: string;
+  password: string;
+  userId: string | null;
+  error: string;
 }
 
-const initialState: UsersState = {
-  users: [],
-  loading: false,
-  error: null,
+const initialState: UserState = {
+  username: '',
+  password: '',
+  userId: null,
+  error: ''
 };
 
-// Создаем slice
-const usersSlice = createSlice({
-  name: 'users',
+const userSlice = createSlice({
+  name: 'user',
   initialState,
-  reducers: {}, // Здесь можно добавить синхронные действия
-  extraReducers: (builder) => {
-    builder
-      .addCase(fetchUsers.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(fetchUsers.fulfilled, (state, action) => {
-        state.loading = false;
-        state.users = action.payload;
-      })
-      .addCase(fetchUsers.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.error.message || 'Error fetching users';
-      });
-  },
+  reducers: {
+    setUserInfo(state, action: PayloadAction<{ username: string; password: string }>) {
+      state.username = action.payload.username;
+      state.password = action.payload.password;
+      state.userId = `${action.payload.username}-${Date.now()}`; // Пример генерации userId
+    },
+    setError(state, action: PayloadAction<string>) {
+      state.error = action.payload;
+    }
+  }
 });
 
-export default usersSlice.reducer;
+export const { setUserInfo, setError } = userSlice.actions;
+
+export default userSlice.reducer;
