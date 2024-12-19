@@ -1,33 +1,97 @@
 // src/usersSlice.ts
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
+import axios from 'axios';
+import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux';
+import type { AppDispatch, RootState } from './store';
 
-interface UserState {
+export const useAppDispatch: () => AppDispatch = useDispatch;
+export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector;
+
+export interface User {
   username: string;
   password: string;
-  userId: string | null;
-  error: string;
+  email: string;
+  userId: string;
+}
+
+interface UserState {
+  users: User[];
+  error: string | null;
+  loading: boolean;
 }
 
 const initialState: UserState = {
-  username: '',
-  password: '',
-  userId: null,
-  error: ''
+  users: [],
+  error: null,
+  loading: false,
 };
+
+export const saveUserToAPI = createAsyncThunk(
+  'user/saveUserToAPI',
+  async (user: Omit<User, 'userId'>, { rejectWithValue }) => {
+    try {
+      const response = await axios.post('http://localhost:3001/users', user);
+      console.log('fetch successful!');
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data?.message || 'Failed to save user');
+    }
+  }
+);
+
+export const fetchUsersFromAPI = createAsyncThunk(
+  'user/fetchUsersFromAPI',
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await axios.get('http://localhost:3001/users');
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data?.message || 'Failed to fetch users');
+    }
+  }
+);
 
 const userSlice = createSlice({
   name: 'user',
   initialState,
   reducers: {
-    setUserInfo(state, action: PayloadAction<{ username: string; password: string }>) {
-      state.username = action.payload.username;
-      state.password = action.payload.password;
-      state.userId = `${action.payload.username}-${Date.now()}`; // Пример генерации userId
+    setUserInfo(state, action: PayloadAction<User>) {
+      state.users.push(action.payload);
+      state.error = null;
     },
     setError(state, action: PayloadAction<string>) {
       state.error = action.payload;
-    }
-  }
+    },
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(fetchUsersFromAPI.pending, (state) => {
+        state.loading = true; 
+      })
+      .addCase(fetchUsersFromAPI.fulfilled, (state, action: PayloadAction<User[]>) => {
+        state.users = action.payload; 
+        state.loading = false;
+        state.error = null;
+      })
+      .addCase(fetchUsersFromAPI.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      })
+
+      
+      .addCase(saveUserToAPI.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(saveUserToAPI.fulfilled, (state, action: PayloadAction<User>) => {
+        state.users.push(action.payload);
+        state.loading = false;
+        state.error = null;
+      })
+      .addCase(saveUserToAPI.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      });
+  },
 });
 
 export const { setUserInfo, setError } = userSlice.actions;
