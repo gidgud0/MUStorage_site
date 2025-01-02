@@ -11,7 +11,7 @@ export interface User {
   username: string;
   password: string;
   email: string;
-  userId: string;
+  id: string;
 }
 
 interface UserState {
@@ -43,7 +43,12 @@ export const fetchUsersFromAPI = createAsyncThunk(
   'user/fetchUsersFromAPI',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await axios.get('http://localhost:3001/users');
+      const response = await axios.get<User[]>('http://localhost:3001/users');
+
+      // Вывод типа данных
+      console.log('Response type:', typeof response.data); // Вернет "object" в runtime
+      console.log('Response data:', response.data); // Фактический массив данных
+      
       return response.data;
     } catch (error: any) {
       return rejectWithValue(error.response?.data?.message || 'Failed to fetch users');

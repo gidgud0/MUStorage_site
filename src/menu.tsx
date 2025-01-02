@@ -1,41 +1,58 @@
+// Menu.tsx
 import { useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useAppSelector } from './usersSlice';
 import { User } from './usersSlice';
 
 function Menu() {
   const location = useLocation();
-  const userId = location.state?.userId;
-  const users = useAppSelector((state) => state.user.users);
-
+  const navigate = useNavigate();
+  const userId = location.state?.id;
+  const users = useAppSelector((state) => state.user.users); // Берем список пользователей из Redux
   const [user, setUser] = useState<User | null>(null);
   const [error, setError] = useState('');
 
   useEffect(() => {
-    if (!userId) {
-      setError('User not found');
+    // Проверяем наличие токена
+    const token = localStorage.getItem('authToken');
+    if (!token) {
+      navigate('/');  // Если токен отсутствует, перенаправляем на страницу логина
       return;
     }
 
-    console.log('Users from Redux:', users);
+    if (!userId) {
+      setError('Пользователь не найден');
+      console.log("Текущий айди пользователя: ", userId)
+      console.log('Текущие пользователи: ', users)
+      return;
+    }
 
-    const foundUser = users.find((user) => user.userId === userId);
+    if (users.length === 0) {
+      setError('Пользователи не загружены');
+      return;
+    }
+
+    // Ищем пользователя в списке
+    const foundUser = users.find((u) => u.id === userId);
 
     if (foundUser) {
       setUser(foundUser);
+      setError('');
     } else {
-      setError('User not found');
+      setUser(null);
+      setError('Пользователь не найден');
     }
-  }, [userId, users]);
+  }, [userId, users, navigate]);
 
   return (
     <div>
       {error ? (
         <p style={{ color: 'red' }}>{error}</p>
       ) : user ? (
-        <div>
-          <h1>Добро пожаловать, {user.username}</h1>
-          <p>Ваш email: {user.email}</p>
+        <div className='max-w-full h-full flex flex-row'>
+            <header className='w-full h-1'>
+                <h1> Mustorage </h1>
+            </header>
         </div>
       ) : (
         <p>Загрузка...</p>

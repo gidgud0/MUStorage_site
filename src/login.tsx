@@ -1,42 +1,85 @@
 import { useState, useEffect } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import './styles/intro.css';
-import './styles/globals.css';
+import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { RootState } from './store';
-import { setError, fetchUsersFromAPI } from './usersSlice';
+import { fetchUsersFromAPI } from './usersSlice';
 import { useNavigate } from 'react-router-dom';
 import { useAppDispatch } from './usersSlice';
+import { setToken } from './authSlice';
+import './styles/intro.css';
+import './styles/globals.css';
+
+export interface User {
+  username: string;
+  password: string;
+  email: string;
+  id: string;
+}
 
 function Login() {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const [inputUsername, setInputUsername] = useState('');
   const [inputPassword, setInputPassword] = useState('');
+  const [error, setError] = useState<string | null>(null);
   const users = useSelector((state: RootState) => state.user.users);
-  const error = useSelector((state: RootState) => state.user.error);
   const loading = useSelector((state: RootState) => state.user.loading);
 
   useEffect(() => {
     dispatch(fetchUsersFromAPI());
+    console.log(users);
   }, [dispatch]);
 
-  const handleLogin = () => {
-    if (!inputUsername.trim() || !inputPassword.trim()) {
-      dispatch(setError('Enter login or password'));
-      return;
+  const handleLogin = async () => {
+    setError(null); // Очистка ошибки перед попыткой входа
+    try {
+      const response = await fetch('http://localhost:3001/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: inputUsername, password: inputPassword }),
+      });
+
+      if (!response.ok) {
+        const { message } = await response.json();
+        setError(message || 'Неверный логин или пароль');
+        return;
+      }
+
+      const data = await response.json();
+      localStorage.setItem('authToken', data.token);
+      console.log('Token saved:', data.token);
+
+      // Сохраняем токен в Redux
+      dispatch(setToken(data.token));
+
+      // Загружаем защищенные данные
+      await fetchProtectedData();
+
+      navigate('/menu'); // Перенаправляем пользователя
+    } catch (error) {
+      console.error('Error during login:', error);
+      setError('Не удалось подключиться к серверу');
     }
+  };
 
-    const user = users.find(
-      (user) => user.username === inputUsername && user.password === inputPassword
-    );
+  const fetchProtectedData = async () => {
+    const token = localStorage.getItem('authToken');
+    try {
+      const response = await fetch('http://localhost:3001/protected', {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${token}`, // Добавляем токен в заголовок
+        },
+      });
 
-    if (user) {
-      console.log('Login successful!', user);
-      dispatch(setError(''));
-      navigate('/menu', { state: { userId: user.userId } });
-    } else {
-      dispatch(setError('Incorrect login or password'));
+      if (response.ok) {
+        const data = await response.json();
+        console.log('Protected data:', data);
+      } else {
+        console.error('Access denied');
+      }
+    } catch (error) {
+      console.error('Error fetching protected data:', error);
     }
   };
 

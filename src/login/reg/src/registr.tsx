@@ -53,9 +53,9 @@
       setErrorState('');
     
       try {
-        const userId = `${username}-${Date.now()}`;
-        await dispatch(saveUserToAPI({ username, password, email })); // Отправляем запрос на сервер
-        setModalOpen(true); // Показываем модальное окно только при успехе
+        const id = `${username}-${Date.now()}`;
+        await dispatch(saveUserToAPI({username, password, email, id}));
+        setModalOpen(true);
       } catch (err: any) {
         setErrorState(err.message || 'Не удалось сохранить пользователя');
       }
