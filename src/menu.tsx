@@ -1,24 +1,16 @@
-// Menu.tsx
 import { useEffect, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import { useAppSelector } from './usersSlice';
 import { User } from './usersSlice';
 
 function Menu() {
   const location = useLocation();
-  const navigate = useNavigate();
   const userId = location.state?.id;
   const users = useAppSelector((state) => state.user.users); // Берем список пользователей из Redux
   const [user, setUser] = useState<User | null>(null);
   const [error, setError] = useState('');
 
   useEffect(() => {
-    // Проверяем наличие токена
-    const token = localStorage.getItem('authToken');
-    if (!token) {
-      navigate('/');  // Если токен отсутствует, перенаправляем на страницу логина
-      return;
-    }
 
     if (!userId) {
       setError('Пользователь не найден');
@@ -42,7 +34,7 @@ function Menu() {
       setUser(null);
       setError('Пользователь не найден');
     }
-  }, [userId, users, navigate]);
+  }, [userId, users]);
 
   return (
     <div>
