@@ -1,6 +1,6 @@
   import React, { useState } from 'react';
   import { useDispatch, useSelector } from 'react-redux';
-  import { saveUserToAPI, setError, useAppDispatch } from '../../../usersSlice'; // Импортируем действия
+  import { saveUserToAPI, setError, useAppDispatch } from '../../../usersSlice';
   import { Link } from 'react-router-dom';
   import './styles/App.css';
   import './styles/modal.css';

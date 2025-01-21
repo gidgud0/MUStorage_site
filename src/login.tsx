@@ -90,7 +90,9 @@ function Login() {
       {error && <div style={{ color: 'red' }}>{error}</div>}
       <div className="hl_container flex flex-row justify-start gap-20">
         <div className="fp">
-          <a href="#"> Забыли пароль? </a>
+          <Link to="/reset" style={{ fontSize: '16px' }}>
+            Забыли пароль?
+          </Link>
         </div>
         <div className="reg">
           <Link to="/registration" style={{ fontSize: '16px' }}>

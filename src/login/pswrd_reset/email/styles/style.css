@@ -1,0 +1,19 @@
+.accept {
+    position: relative;
+    margin-bottom: -1rem;
+    top: 2em;
+}
+
+.success, .fail {
+    position: relative;
+    top: 5em;
+    margin-bottom: 2em;
+}
+
+.fail {
+    color: red;
+}
+
+.success {
+    color: green;
+}
