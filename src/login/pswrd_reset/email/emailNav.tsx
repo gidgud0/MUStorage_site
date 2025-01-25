@@ -4,30 +4,84 @@ import { RootState, AppDispatch } from '../../../store';
 import { saveUserToAPI, setError, useAppDispatch, fetchUsersFromAPI } from '../../../usersSlice';
 import { useDispatch, useSelector } from 'react-redux';
 
-
+// основная функция сброса пароля через почту
 function EmailReset() {
     const [email, setEmail] = useState<string>('');
     const [foundEmail, setFoundEmail] = useState<boolean>(false);
     const users = useSelector((state: RootState) => state.user.users);
     const dispatch = useAppDispatch();
     const [isModalOpen, setModalOpen] = useState<boolean>(false);
+    const [code, setCode] = useState<string>('');
+    const [isCodeValid, setIsCodeValid] = useState<boolean>(false);
+    const [confirm, setConfirm] = useState<boolean>(false);
+    const [inputCode, setInputCode] = useState<string>('');
 
+    // Генерация кода для подтверждения почты
+    function generateSixDigitCodeString(): string {
+        return Math.floor(100000 + Math.random() * 900000).toString(); // Генеиация кода 6-значная, тоесть минимально 100000 и максимально 900000
+    }
+
+    // Закрытие всплывающего окна
+    function closeModal() {
+        setModalOpen(false);
+        return
+    }
+
+    // Фетч всех пользователей из базы данных
     useEffect(() => {
         dispatch(fetchUsersFromAPI());
         console.log(users);
       }, [dispatch]);
-    
+
+    // Проверка на валидантность кода при верификации почты /дебаг
+    useEffect(() => {
+        if (isCodeValid) {
+            console.log('Код стал валидным: ', code);
+        }
+    }, [isCodeValid]);
+
+    // Автоматическое продолжение при нажатии клавиши Enter после ввода данных в Input
+    function handleKeyPress(event: React.KeyboardEvent<HTMLInputElement>, context: string) {
+        if (event.key === 'Enter') {
+            if (context === 'email') {
+                handleEmailFind();
+            } else if (context === 'code') {
+                handleCodeCheck();
+            }
+        }
+    }
+
+    // Основной хэндлер на поиск почты из массива данных
     function handleEmailFind() {
+        const newCode = generateSixDigitCodeString();
         const emailExists = users.some(user => 
             user.email.toLowerCase() === email.trim().toLowerCase()
         );
         console.log("найдена почта из массива: ", email, ", статус проверки: ", emailExists);
+        if(emailExists == true) {
+            setCode(newCode);
+            setIsCodeValid(true);
+            console.log('новый код: ', newCode, ', состояние: true')
+        };
         setFoundEmail(emailExists);
         setModalOpen(emailExists);
         return;
     }
     
+    // Проверка на правильность кода при вводе во время проверки почты
+    function handleCodeCheck() {
+        if (inputCode === code) {
+            setConfirm(true);
+            console.log('Код подтверждён!');
+            closeModal();
+        } else {
+            setConfirm(false);
+            console.log('Неверный код, попробуйте снова!');
+        }
+    }
 
+
+    // Большая часть CSS была сделана с помощью Tailwind CSS
     return (
         <div className="contnr">
             <input 
@@ -36,6 +90,7 @@ function EmailReset() {
             onChange={(e) => setEmail(e.target.value)}
             className="p-3 w-full"
             placeholder="Введите вашу почту"
+            onKeyDown={(e) => handleKeyPress(e, 'email')}
             >
             </input>
             <button
@@ -45,11 +100,18 @@ function EmailReset() {
             {isModalOpen && (
             <div className="modal flex flex-col items-center justify-center fixed top-0 left-0 w-full h-full bg-gray-800 bg-opacity-50">
                 <div className="modal-content bg-gray-800 p-6 rounded shadow-lg text-center">
+                    
                     <h2> Введите код, который был отправлен на почту {email}. </h2>
                     <input 
                     placeholder="Ваш 6-значный код"
-                    
+                    value={inputCode}
+                    onChange={(e) => setInputCode(e.target.value)}
+                    onKeyDown={(e) => handleKeyPress(e, 'code')}
                     ></input>
+                    <div>
+                        <button onClick={closeModal}> Назад </button>
+                        <button onClick={handleCodeCheck}> Продолжить </button>
+                    </div>
                 </div>
             </div>
             )}
