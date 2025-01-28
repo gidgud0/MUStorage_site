@@ -1,8 +1,9 @@
 import "./styles/style.css"
 import React, { useState, useEffect } from 'react';
 import { RootState, AppDispatch } from '../../../store';
-import { saveUserToAPI, setError, useAppDispatch, fetchUsersFromAPI } from '../../../usersSlice';
+import { saveUserToAPI, setError, useAppDispatch, fetchUsersFromAPI, setConfirmedUser, User } from '../../../usersSlice';
 import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from "react-router-dom";
 
 // основная функция сброса пароля через почту
 function EmailReset() {
@@ -15,6 +16,13 @@ function EmailReset() {
     const [isCodeValid, setIsCodeValid] = useState<boolean>(false);
     const [confirm, setConfirm] = useState<boolean>(false);
     const [inputCode, setInputCode] = useState<string>('');
+    const navigate = useNavigate();
+
+
+    function confirmUserHandler(user: User) {
+        dispatch(setConfirmedUser(user)); // Устанавливаем подтверждённого пользователя
+        console.log('Подтверждённый пользователь:', user);
+      }
 
     // Генерация кода для подтверждения почты
     function generateSixDigitCodeString(): string {
@@ -68,15 +76,24 @@ function EmailReset() {
         return;
     }
     
-    // Проверка на правильность кода при вводе во время проверки почты
+    // Проверка кода
     function handleCodeCheck() {
         if (inputCode === code) {
             setConfirm(true);
-            console.log('Код подтверждён!');
+            console.log("Код подтверждён!");
             closeModal();
+    
+            // Здесь вызываем confirmUserHandler, передавая пользователя
+            const confirmedUser = users.find(user => user.email.toLowerCase() === email.trim().toLowerCase());
+            if (confirmedUser) {
+                confirmUserHandler(confirmedUser);
+            }
+    
+            // Перенаправление на страницу сброса пароля
+            navigate("/PasswordReset", { state: { users } });
         } else {
             setConfirm(false);
-            console.log('Неверный код, попробуйте снова!');
+            console.log("Неверный код, попробуйте снова!");
         }
     }
 

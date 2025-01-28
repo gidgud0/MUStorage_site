@@ -3,7 +3,7 @@
     {
       "id": "1",
       "username": "test",
-      "password": "test1",
+      "password": "test0",
       "email": "test@example.com"
     },
     {
@@ -15,8 +15,20 @@
     {
       "id": "e132",
       "username": "gidgud",
-      "password": "пшвпгв2",
+      "password": "admin3",
       "email": "Daniluv0902@gmail.com"
+    },
+    {
+      "id": "robdiezz-1738033847626",
+      "username": "robdiezz",
+      "password": "admin",
+      "email": "testtest@gmail.com"
+    },
+    {
+      "id": "ggud-1738033887349",
+      "username": "ggud",
+      "password": "ggg",
+      "email": "pupupu@gmail.com"
     }
   ]
 }

@@ -11,7 +11,7 @@ import Menu from './menu.tsx'
 import Reset from './login/pswrd_reset/PasswordReset.tsx'
 import UsernameReset from "./login/pswrd_reset/username/usernameNav.tsx"
 import EmailReset from "./login/pswrd_reset/email/emailNav.tsx"
-
+import PasswordReset from "./login/pswrd_reset/reset/pwrd_reset.tsx"
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
@@ -24,6 +24,7 @@ createRoot(document.getElementById('root')!).render(
           <Route path="/reset" element={<Reset />} />
           <Route path="/throughUsername" element={<UsernameReset />} />
           <Route path="/throughEmail" element={<EmailReset />} />
+          <Route path="/PasswordReset" element={<PasswordReset />} />
         </Routes>
       </Router>
     </Provider>
